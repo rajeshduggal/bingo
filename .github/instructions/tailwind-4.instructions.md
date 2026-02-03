@@ -35,3 +35,6 @@ Quick commands
 - Lint: `npm run lint`
 
 Keep it simple: favor readable classnames, small shared component classes, and explicit safelists for any runtime-generated utilities.
+
+// Seed prompt
+// > Fill in a 1-pager copilot instructions (compact, minimal prose), targeted for frontend devs and focused on tailwind v4-specific development essentials; #web_search
