@@ -1,3 +1,8 @@
+
+---
+applyTo: "src/**/*.{ts,tsx,js,jsx,css},tailwind.config.*,postcss.config.*"
+---
+
 Tailwind v4 — Copilot 1‑pager (frontend devs)
 
 Purpose
