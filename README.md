@@ -6,7 +6,7 @@
 
 *An interactive bingo game designed for in-person mixers, team events, and social gatherings*
 
-[🎮 Play Live Demo](#) • [📚 Lab Guide](.lab/GUIDE.md) • [🤝 Contributing](CONTRIBUTING.md)
+[📚 Lab Guide](.lab/GUIDE.md) • [🤝 Contributing](CONTRIBUTING.md) • [💬 Support](SUPPORT.md)
 
 ---
 
@@ -130,6 +130,6 @@ Created as part of the VS Code Agent Lab workshop by Harald Kirschner ([@digitar
 
 **Made with ❤️ for building connections**
 
-[⭐ Star this repo](https://github.com/rajeshduggal/bingo) if you find it useful!
+⭐ Star this repo if you find it useful!
 
 </div>
