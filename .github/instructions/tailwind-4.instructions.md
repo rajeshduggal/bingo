@@ -1,83 +1,37 @@
----
-description: Read before writing any Tailwind CSS to understand the latest v4 features.
----
+Tailwind v4 — Copilot 1‑pager (frontend devs)
 
-# Tailwind CSS v4 Development Practices
+Purpose
+- Quick, practical Tailwind CSS v4 notes for everyday frontend work in this repo.
 
-## Core Philosophy
-- CSS-first configuration via `@theme` directive (no `tailwind.config.js`)
-- Native CSS features: cascade layers, `@property`, `color-mix()`, logical properties
-- Automatic content detection
+Essentials
+- Confirm the project `tailwind.config.*` is at the repo root and update `content` paths to cover `src/**/*.{js,ts,jsx,tsx}`.
+- Use the CLI or local dependency to verify version: `npx tailwindcss -v`.
 
-## Setup
-```css
-@import "tailwindcss";
-```
+Config & theme
+- Keep tokens and theme extensions in `theme.extend` to centralize colors, radii, fonts.
+- Put global CSS and `@tailwind` layers in `src/index.css` (or the project's entry CSS).
 
-## @theme Configuration
+Developer practices
+- Prefer utility-first classes for layout; extract repeated patterns into `@layer components` with `@apply`.
+- For dynamic classnames use a helper (`clsx`/`cn`) and avoid fully dynamic strings that Tailwind can't see (use safelist or explicit mappings).
+- Use responsive prefixes (`sm:`, `md:`, `lg:`) and variant utilities consistently; keep breakpoints in `tailwind.config`.
 
-### Define Tokens
-```css
-@theme {
-  --color-brand: oklch(0.72 0.11 178);
-  --font-display: "Inter", sans-serif;
-  --breakpoint-tablet: 640px;
-}
-```
-→ Use as: `bg-brand`, `font-display`
+Performance & tooling
+- Ensure `content` (purge) paths include all runtime templates and component file patterns.
+- When adding dynamic variants or runtime-generated classes, add them to a `safelist` in `tailwind.config`.
+- Run `npm run build` / dev server to validate no missing styles.
 
-### Multi-theme Pattern
-```css
-@theme inline {
-  --color-primary: var(--primary);
-}
+Testing & accessibility
+- Test components with their styles (snapshot or visual tests) to catch accidental class churn.
+- Prefer semantic HTML classes + Tailwind for presentational concerns.
 
-:root { --primary: #3b82f6; }
-.dark { --primary: #60a5fa; }
-```
-Use `@theme inline` for runtime variable resolution.
+Migration & troubleshooting
+- Check the Tailwind v4 changelog for breaking changes before upgrading packages; update `postcss` or plugins as necessary.
+- If a utility disappears, search `tailwind.config` for renamed tokens or moved plugins.
 
-### Rules
-- Keep @theme variables flat (top-level only)
-- No nesting in @media or selectors
-- Use :root for non-Tailwind CSS variables
+Quick commands
+- Dev: `npm run dev`  
+- Build: `npm run build`  
+- Lint: `npm run lint`
 
-## v4 Features
-
-### Native Opacity
-```html
-<div class="bg-black/50 text-brand/75">
-```
-
-### Container Queries
-```html
-<div class="@container">
-  <div class="@md:text-lg">
-</div>
-```
-
-### Arbitrary CSS Variables
-```html
-<div class="fill-[--my-color] w-[--sidebar-width]">
-```
-
-### New Utilities
-- 3D: `rotate-x-45`, `rotate-y-90`
-- Gradients: `bg-gradient-radial`, `bg-gradient-conic`
-- Variants: `not-*`, `color-scheme:*`, `@starting-style`
-
-## Migration
-
-### Renamed Classes
-- `bg-opacity-50` → `bg-black/50`
-- `overflow-ellipsis` → `text-ellipsis`
-- `shadow-sm` → `shadow-xs`
-
-## Best Practices
-1. Put design tokens in `@theme`
-2. Use `:root` for regular CSS variables
-3. Trust auto-detection
-4. Prefer `w-[--custom]` over complex config
-
-// Seed prompt
-// > Fill in a 1-pager copilot instructions (compact, minimal prose), targeted for frontend devs and focused on tailwind v4-specific development essentials; #web_search
+Keep it simple: favor readable classnames, small shared component classes, and explicit safelists for any runtime-generated utilities.
