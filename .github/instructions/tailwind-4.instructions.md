@@ -41,5 +41,6 @@ Quick commands
 
 Keep it simple: favor readable classnames, small shared component classes, and explicit safelists for any runtime-generated utilities.
 
-// Seed prompt
+// Prompts:
 // > Fill in a 1-pager copilot instructions (compact, minimal prose), targeted for frontend devs and focused on tailwind v4-specific development essentials; #web_search
+// > Read https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions#creating-path-specific-custom-instructions-1 and apply the recommendations to make #file:tailwind-4.instructions.md into a path-specific custom instructions file for tailwind.
