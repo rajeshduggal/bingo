@@ -65,6 +65,27 @@ describe('bingoLogic', () => {
       expect(texts1).toHaveLength(24);
       expect(texts2).toHaveLength(24);
     });
+
+    it('should return 25 entries with center free for both modes', () => {
+      const boardClassic = generateBoard();
+      const boardScavenger = generateBoard('scavenger');
+
+      expect(boardClassic).toHaveLength(25);
+      expect(boardScavenger).toHaveLength(25);
+
+      expect(boardClassic[12].isFreeSpace).toBe(true);
+      expect(boardScavenger[12].isFreeSpace).toBe(true);
+
+      // additional shape checks: ids and non-free count
+      const idsClassic = boardClassic.map((s) => s.id);
+      const idsScavenger = boardScavenger.map((s) => s.id);
+      expect(idsClassic).toEqual(idsScavenger);
+
+      const nonFreeClassic = boardClassic.filter((s) => !s.isFreeSpace);
+      const nonFreeScavenger = boardScavenger.filter((s) => !s.isFreeSpace);
+      expect(nonFreeClassic).toHaveLength(24);
+      expect(nonFreeScavenger).toHaveLength(24);
+    });
   });
 
   describe('toggleSquare', () => {

@@ -1,4 +1,5 @@
 {
+  "typescript.tsdk": "node_modules/typescript/lib",
   "chat.customAgentInSubagent.enabled": true,
   "scm.repositories.selectionMode": "single",
   "chat.promptFilesRecommendations": {

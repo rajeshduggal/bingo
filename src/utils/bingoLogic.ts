@@ -1,5 +1,5 @@
 import { questions, FREE_SPACE } from '../data/questions';
-import type { BingoSquareData, BingoLine } from '../types';
+import type { BingoSquareData, BingoLine, Mode } from '../types';
 
 // Re-export types for convenience
 export type { BingoSquareData, BingoLine } from '../types';
@@ -22,27 +22,25 @@ function shuffleArray<T>(array: T[]): T[] {
 /**
  * Generate a new 5x5 bingo board
  */
-export function generateBoard(): BingoSquareData[] {
+export function generateBoard(mode?: Mode): BingoSquareData[] {
+  // `mode` is currently unused — board shape is same for all modes.
   const shuffledQuestions = shuffleArray(questions).slice(0, 24);
   const board: BingoSquareData[] = [];
+  function makeSquare(id: number, text: string, isFree = false): BingoSquareData {
+    return {
+      id,
+      text,
+      isMarked: isFree,
+      isFreeSpace: isFree,
+    };
+  }
 
   let questionIndex = 0;
-  for (let i = 0; i < 25; i++) {
+  for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
     if (i === CENTER_INDEX) {
-      board.push({
-        id: i,
-        text: FREE_SPACE,
-        isMarked: true,
-        isFreeSpace: true,
-      });
+      board.push(makeSquare(i, FREE_SPACE, true));
     } else {
-      board.push({
-        id: i,
-        text: shuffledQuestions[questionIndex],
-        isMarked: false,
-        isFreeSpace: false,
-      });
-      questionIndex++;
+      board.push(makeSquare(i, shuffledQuestions[questionIndex++]));
     }
   }
 
