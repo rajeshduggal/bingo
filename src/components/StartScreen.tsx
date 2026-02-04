@@ -1,8 +1,13 @@
+import { useState } from 'react';
+import type { Mode } from '../types';
+
 interface StartScreenProps {
-  onStart: () => void;
+  onStart: (mode: Mode) => void;
 }
 
 export function StartScreen({ onStart }: StartScreenProps) {
+  const [mode, setMode] = useState<Mode>('classic');
+
   return (
     <div className="flex flex-col items-center justify-center min-h-full p-6">
       <div className="text-center max-w-sm">
@@ -19,8 +24,33 @@ export function StartScreen({ onStart }: StartScreenProps) {
           </ul>
         </div>
 
+        <fieldset className="mb-4 flex justify-center gap-4" aria-label="Mode">
+          <label className="inline-flex items-center">
+            <input
+              type="radio"
+              name="mode"
+              value="classic"
+              checked={mode === 'classic'}
+              onChange={() => setMode('classic')}
+              className="mr-2"
+            />
+            Classic
+          </label>
+          <label className="inline-flex items-center">
+            <input
+              type="radio"
+              name="mode"
+              value="scavenger"
+              checked={mode === 'scavenger'}
+              onChange={() => setMode('scavenger')}
+              className="mr-2"
+            />
+            Scavenger
+          </label>
+        </fieldset>
+
         <button
-          onClick={onStart}
+          onClick={() => onStart(mode)}
           className="w-full bg-accent text-white font-semibold py-4 px-8 rounded-lg text-lg active:bg-accent-light transition-colors"
         >
           Start Game

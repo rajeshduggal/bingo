@@ -14,3 +14,5 @@ export interface BingoLine {
 }
 
 export type GameState = 'start' | 'playing' | 'bingo';
+
+export type Mode = 'classic' | 'scavenger';

@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import type { BingoSquareData, BingoLine, GameState } from '../types';
+import type { BingoSquareData, BingoLine, GameState, Mode } from '../types';
 import {
   generateBoard,
   toggleSquare,
@@ -15,7 +15,7 @@ export interface BingoGameState {
 }
 
 export interface BingoGameActions {
-  startGame: () => void;
+  startGame: (mode?: Mode) => void;
   handleSquareClick: (squareId: number) => void;
   resetGame: () => void;
   dismissModal: () => void;
@@ -160,7 +160,8 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
     saveGameState(gameState, board, winningLine);
   }, [gameState, board, winningLine]);
 
-  const startGame = useCallback(() => {
+  const startGame = useCallback((mode?: Mode) => {
+    // mode is accepted for future behavior (scavenger vs classic)
     setBoard(generateBoard());
     setWinningLine(null);
     setGameState('playing');
