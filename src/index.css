@@ -44,4 +44,48 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   -webkit-tap-highlight-color: transparent;
 }
+
+/* Accessibility: Font size classes */
+html.font-normal {
+  font-size: 16px;
+}
+
+html.font-large {
+  font-size: 18px;
+}
+
+html.font-extra-large {
+  font-size: 20px;
+}
+
+/* Accessibility: High contrast mode */
+html.high-contrast {
+  --color-coffee-brown: #000000;
+  --color-warm-cream: #FFFFFF;
+  --color-amber-syrup: #FF8C00;
+}
+
+html.high-contrast body {
+  background-color: #FFFFFF;
+  background-image: none;
+}
+
+html.high-contrast .card {
+  background-color: #FFFFFF;
+  background-image: none;
+  border: 2px solid #000000;
+}
+
+html.high-contrast .bg-accent {
+  background-color: #000000;
+  color: #FFFFFF;
+  border: 2px solid #000000;
+}
+
+html.high-contrast .bg-marked {
+  background-color: #FF8C00;
+  color: #000000;
+  border: 2px solid #000000;
+}
+
   .card { border-radius: 1rem; box-shadow: 0 6px 18px rgba(0,0,0,0.06); padding: 1.5rem; background-color: var(--color-warm-cream); }
