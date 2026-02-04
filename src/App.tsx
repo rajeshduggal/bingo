@@ -1,6 +1,7 @@
 import { useBingoGame } from './hooks/useBingoGame';
 import { StartScreen } from './components/StartScreen';
 import { GameScreen } from './components/GameScreen';
+import { ScavengerScreen } from './components/ScavengerScreen';
 import { BingoModal } from './components/BingoModal';
 
 function App() {
@@ -19,18 +20,22 @@ function App() {
     return <StartScreen onStart={startGame} />;
   }
 
+  const mainScreen = mode === 'scavenger' ? (
+    <ScavengerScreen board={board} onToggle={handleSquareClick} />
+  ) : (
+    <GameScreen
+      board={board}
+      winningSquareIds={winningSquareIds}
+      hasBingo={gameState === 'bingo'}
+      onSquareClick={handleSquareClick}
+      onReset={resetGame}
+    />
+  );
+
   return (
     <>
-      <GameScreen
-        board={board}
-        winningSquareIds={winningSquareIds}
-        hasBingo={gameState === 'bingo'}
-        onSquareClick={handleSquareClick}
-        onReset={resetGame}
-      />
-      {showBingoModal && (
-        <BingoModal onDismiss={dismissModal} />
-      )}
+      {mainScreen}
+      {showBingoModal && <BingoModal onDismiss={dismissModal} />}
     </>
   );
 }

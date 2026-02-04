@@ -131,7 +131,7 @@ function saveGameState(gameState: GameState, board: BingoSquareData[], winningLi
   }
 }
 
-export function useBingoGame(): BingoGameState & BingoGameActions {
+export function useBingoGame(): BingoGameState & BingoGameActions & { mode?: Mode } {
   const loadedState = useMemo(() => loadGameState(), []);
 
   const [gameState, setGameState] = useState<GameState>(
@@ -159,7 +159,7 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
   const startGame = useCallback((m?: Mode) => {
     // Save chosen mode and start
     setMode(m);
-    setBoard(generateBoard());
+    setBoard(generateBoard(m));
     setWinningLine(null);
     setGameState('playing');
   }, []);
@@ -199,6 +199,7 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
     board,
     winningSquareIds,
     showBingoModal,
+    mode,
     startGame,
     handleSquareClick,
     resetGame,
