@@ -22,8 +22,8 @@ function shuffleArray<T>(array: T[]): T[] {
 /**
  * Generate a new 5x5 bingo board
  */
-export function generateBoard(mode?: Mode): BingoSquareData[] {
-  // `mode` is currently unused — board shape is same for all modes.
+export function generateBoard(_mode?: Mode): BingoSquareData[] {
+  // `_mode` is currently unused — board shape is same for all modes.
   const shuffledQuestions = shuffleArray(questions).slice(0, 24);
   const board: BingoSquareData[] = [];
   function makeSquare(id: number, text: string, isFree = false): BingoSquareData {

@@ -39,17 +39,30 @@ test('starting a scavenger game saves state with version 2 and mode=scavenger', 
 
   expect(setItemSpy).toHaveBeenCalled();
 
-  const arg = setItemSpy.mock.calls[0][1];
-  const parsedUnknown = JSON.parse(arg) as unknown;
-  function isStored(data: unknown): data is { version: number; mode?: string } {
-    return !!data && typeof data === 'object' && typeof (data as Record<string, unknown>)['version'] === 'number';
+  // The hook may call setItem on mount and again when starting the game.
+  // Find a call where the stored `version` is 2 and `mode` is 'scavenger'.
+  const calls = setItemSpy.mock.calls.map((c) => c[1]);
+  const parsedCalls = calls
+    .map((c) => {
+      try {
+        return JSON.parse(c) as unknown;
+      } catch {
+        return null;
+      }
+    })
+    .filter((x): x is unknown => x !== null);
+
+  function findStored(scans: unknown[]): { version: number; mode?: string } | undefined {
+    return scans.find((s): s is { version: number; mode?: string } => {
+        if (!s || typeof s !== 'object') return false;
+        const obj = s as { version?: unknown };
+        return typeof obj.version === 'number' && obj.version === 2;
+    }) as { version: number; mode?: string } | undefined;
   }
 
-  expect(isStored(parsedUnknown)).toBe(true);
-  if (isStored(parsedUnknown)) {
-    expect(parsedUnknown.version).toBe(2);
-    expect(parsedUnknown.mode).toBe('scavenger');
-  }
+  const found = findStored(parsedCalls);
+  expect(found).toBeTruthy();
+  if (found) expect(found.mode).toBe('scavenger');
 });
 
 test('loading v1 data without mode either migrates to v2 or clears state', () => {

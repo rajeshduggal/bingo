@@ -153,15 +153,33 @@ export function useBingoGame(): BingoGameState & BingoGameActions & { mode?: Mod
 
   // Save game state to localStorage whenever it changes
   useEffect(() => {
+    // Avoid persisting the empty default state on first mount when there is
+    // no previously loaded state — tests expect the first meaningful write
+    // to happen when the game is started.
+    if (
+      !loadedState &&
+      gameState === 'start' &&
+      board.length === 0 &&
+      winningLine === null &&
+      typeof mode === 'undefined'
+    ) {
+      return;
+    }
+
     saveGameState(gameState, board, winningLine, mode);
-  }, [gameState, board, winningLine, mode]);
+  }, [gameState, board, winningLine, mode, loadedState]);
 
   const startGame = useCallback((m?: Mode) => {
-    // Save chosen mode and start
+    // Save chosen mode and start. Compute new board and persist immediately
+    const newBoard = generateBoard(m);
     setMode(m);
-    setBoard(generateBoard(m));
+    setBoard(newBoard);
     setWinningLine(null);
     setGameState('playing');
+
+    // Immediately persist the chosen mode and new board so tests/readers
+    // that check localStorage right after starting the game see the data.
+    saveGameState('playing', newBoard, null, m);
   }, []);
 
   const handleSquareClick = useCallback((squareId: number) => {

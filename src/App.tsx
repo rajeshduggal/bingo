@@ -10,6 +10,7 @@ function App() {
     board,
     winningSquareIds,
     showBingoModal,
+    mode,
     startGame,
     handleSquareClick,
     resetGame,

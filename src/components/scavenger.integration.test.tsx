@@ -46,8 +46,12 @@ test('full scavenger flow persists mode and checked items across remount', async
   // pick first two items and record their labels
   const first = checkboxes[0];
   const second = checkboxes[1];
-  const firstLabel = first.getAttribute('aria-label') as string;
-  const secondLabel = second.getAttribute('aria-label') as string;
+  const firstLabel = first.getAttribute('aria-label');
+  const secondLabel = second.getAttribute('aria-label');
+  expect(firstLabel).toBeTruthy();
+  expect(secondLabel).toBeTruthy();
+  const firstLabelStr = String(firstLabel);
+  const secondLabelStr = String(secondLabel);
 
   // toggle them
   fireEvent.click(first);
@@ -56,14 +60,26 @@ test('full scavenger flow persists mode and checked items across remount', async
   // expect localStorage saved with mode=scavenger and version 2
   expect(setItemSpy).toHaveBeenCalled();
   const lastCall = setItemSpy.mock.calls[setItemSpy.mock.calls.length - 1][1];
-  const parsed = JSON.parse(lastCall) as any;
-  expect(parsed.version).toBe(2);
-  expect(parsed.mode).toBe('scavenger');
+  const parsedUnknown: unknown = JSON.parse(lastCall);
 
-  // expect the saved board has those texts marked true
-  const marked = parsed.board.filter((s: any) => s.isMarked).map((s: any) => s.text);
-  expect(marked).toContain(firstLabel);
-  expect(marked).toContain(secondLabel);
+  type Stored = { version: number; mode?: string; board: Array<{ isMarked: boolean; text: string }> };
+  function isStored(x: unknown): x is Stored {
+    if (typeof x !== 'object' || x === null) return false;
+    const obj = x as { version?: unknown; board?: unknown };
+    return typeof obj.version === 'number' && Array.isArray(obj.board);
+  }
+
+  expect(isStored(parsedUnknown)).toBe(true);
+  let marked: string[] = [];
+  if (isStored(parsedUnknown)) {
+    expect(parsedUnknown.version).toBe(2);
+    expect(parsedUnknown.mode).toBe('scavenger');
+
+    // expect the saved board has those texts marked true
+    marked = parsedUnknown.board.filter((s) => s.isMarked).map((s) => s.text);
+    expect(marked).toContain(firstLabelStr);
+    expect(marked).toContain(secondLabelStr);
+  }
 
   // unmount and remount to simulate reload
   unmount();
@@ -71,8 +87,8 @@ test('full scavenger flow persists mode and checked items across remount', async
   render(<TestHarness />);
 
   // after remount, those checkboxes should be checked
-  const firstCheckbox = await screen.findByLabelText(firstLabel) as HTMLInputElement;
-  const secondCheckbox = await screen.findByLabelText(secondLabel) as HTMLInputElement;
+  const firstCheckbox = await screen.findByLabelText(firstLabelStr) as HTMLInputElement;
+  const secondCheckbox = await screen.findByLabelText(secondLabelStr) as HTMLInputElement;
   expect(firstCheckbox.checked).toBe(true);
   expect(secondCheckbox.checked).toBe(true);
 
