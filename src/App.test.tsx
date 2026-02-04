@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, afterEach } from 'vitest';
 import * as useBingo from './hooks/useBingoGame';
+import type { BingoGameState, BingoGameActions } from './hooks/useBingoGame';
 import App from './App';
 
 afterEach(() => {
@@ -10,7 +11,7 @@ afterEach(() => {
 test('selecting scavenger and clicking Start calls startGame with mode', () => {
   const startGame = vi.fn();
 
-  vi.spyOn(useBingo, 'useBingoGame').mockReturnValue({
+  const mocked: BingoGameState & BingoGameActions = {
     gameState: 'start',
     board: [],
     winningSquareIds: new Set<number>(),
@@ -19,7 +20,9 @@ test('selecting scavenger and clicking Start calls startGame with mode', () => {
     handleSquareClick: () => {},
     resetGame: () => {},
     dismissModal: () => {},
-  } as any);
+  };
+
+  vi.spyOn(useBingo, 'useBingoGame').mockReturnValue(mocked as unknown as ReturnType<typeof useBingo.useBingoGame>);
 
   render(<App />);
 

@@ -22,7 +22,7 @@ export interface BingoGameActions {
 }
 
 const STORAGE_KEY = 'bingo-game-state';
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
 const isBrowser = typeof window !== 'undefined';
 
 interface StoredGameData {
@@ -86,20 +86,21 @@ function validateStoredData(data: unknown): data is StoredGameData {
   return true;
 }
 
-function loadGameState(): { gameState: GameState; board: BingoSquareData[]; winningLine: BingoLine | null } | null {
+function loadGameState(): { gameState: GameState; board: BingoSquareData[]; winningLine: BingoLine | null; mode?: Mode } | null {
   if (!isBrowser) return null;
 
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) return null;
 
-    const parsed = JSON.parse(saved);
+    const parsed: unknown = JSON.parse(saved);
 
     if (validateStoredData(parsed)) {
       return {
         gameState: parsed.gameState,
         board: parsed.board,
         winningLine: parsed.winningLine,
+        mode: parsed.mode,
       };
     }
 
@@ -113,7 +114,7 @@ function loadGameState(): { gameState: GameState; board: BingoSquareData[]; winn
   return null;
 }
 
-function saveGameState(gameState: GameState, board: BingoSquareData[], winningLine: BingoLine | null): void {
+function saveGameState(gameState: GameState, board: BingoSquareData[], winningLine: BingoLine | null, mode?: Mode): void {
   if (!isBrowser) return;
 
   try {
@@ -122,6 +123,7 @@ function saveGameState(gameState: GameState, board: BingoSquareData[], winningLi
       gameState,
       board,
       winningLine,
+      mode,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (error) {
@@ -141,6 +143,7 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
   const [winningLine, setWinningLine] = useState<BingoLine | null>(
     () => loadedState?.winningLine || null
   );
+  const [mode, setMode] = useState<Mode | undefined>(() => loadedState?.mode);
   const [showBingoModal, setShowBingoModal] = useState(false);
 
   const winningSquareIds = useMemo(
@@ -150,11 +153,12 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
 
   // Save game state to localStorage whenever it changes
   useEffect(() => {
-    saveGameState(gameState, board, winningLine);
-  }, [gameState, board, winningLine]);
+    saveGameState(gameState, board, winningLine, mode);
+  }, [gameState, board, winningLine, mode]);
 
-  const startGame = useCallback((mode?: Mode) => {
-    // mode is accepted for future behavior (scavenger vs classic)
+  const startGame = useCallback((m?: Mode) => {
+    // Save chosen mode and start
+    setMode(m);
     setBoard(generateBoard());
     setWinningLine(null);
     setGameState('playing');

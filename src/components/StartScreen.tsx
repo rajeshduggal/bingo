@@ -5,9 +5,30 @@ interface StartScreenProps {
   onStart: (mode: Mode) => void;
 }
 
+const MODE_OPTIONS: Mode[] = ['classic', 'scavenger'];
+
+function formatModeLabel(mode: Mode) {
+  return mode[0].toUpperCase() + mode.slice(1);
+}
+
+function RadioOption({ value, checked, onChange }: { value: Mode; checked: boolean; onChange: (v: Mode) => void }) {
+  return (
+    <label className="inline-flex items-center">
+      <input
+        type="radio"
+        name="mode"
+        value={value}
+        checked={checked}
+        onChange={() => onChange(value)}
+        className="mr-2"
+      />
+      {formatModeLabel(value)}
+    </label>
+  );
+}
+
 export function StartScreen({ onStart }: StartScreenProps) {
   const [mode, setMode] = useState<Mode>('classic');
-  const MODE_OPTIONS: Mode[] = ['classic', 'scavenger'];
 
   return (
     <div className="flex flex-col items-center justify-center min-h-full p-6">
@@ -27,17 +48,7 @@ export function StartScreen({ onStart }: StartScreenProps) {
 
         <fieldset className="mb-4 flex justify-center gap-4" aria-label="Mode">
           {MODE_OPTIONS.map((opt) => (
-            <label key={opt} className="inline-flex items-center">
-              <input
-                type="radio"
-                name="mode"
-                value={opt}
-                checked={mode === opt}
-                onChange={() => setMode(opt)}
-                className="mr-2"
-              />
-              {opt[0].toUpperCase() + opt.slice(1)}
-            </label>
+            <RadioOption key={opt} value={opt} checked={mode === opt} onChange={setMode} />
           ))}
         </fieldset>
 
