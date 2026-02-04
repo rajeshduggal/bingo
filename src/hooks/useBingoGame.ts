@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import type { BingoSquareData, BingoLine, GameState } from '../types';
+import type { BingoSquareData, BingoLine, GameState, AccessibilityPreferences } from '../types';
 import {
   generateBoard,
   toggleSquare,
@@ -12,6 +12,7 @@ export interface BingoGameState {
   board: BingoSquareData[];
   winningSquareIds: Set<number>;
   showBingoModal: boolean;
+  accessibilityPreferences: AccessibilityPreferences;
 }
 
 export interface BingoGameActions {
@@ -19,16 +20,18 @@ export interface BingoGameActions {
   handleSquareClick: (squareId: number) => void;
   resetGame: () => void;
   dismissModal: () => void;
+  updateAccessibilityPreferences: (preferences: Partial<AccessibilityPreferences>) => void;
 }
 
 const STORAGE_KEY = 'bingo-game-state';
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
 
 interface StoredGameData {
   version: number;
   gameState: GameState;
   board: BingoSquareData[];
   winningLine: BingoLine | null;
+  accessibilityPreferences?: AccessibilityPreferences;
 }
 
 function validateStoredData(data: unknown): data is StoredGameData {
@@ -38,7 +41,8 @@ function validateStoredData(data: unknown): data is StoredGameData {
   
   const obj = data as Record<string, unknown>;
   
-  if (obj.version !== STORAGE_VERSION) {
+  // Support both version 1 and version 2
+  if (typeof obj.version !== 'number' || (obj.version !== 1 && obj.version !== STORAGE_VERSION)) {
     return false;
   }
   
@@ -80,10 +84,24 @@ function validateStoredData(data: unknown): data is StoredGameData {
     }
   }
   
+  // For version 2, validate accessibility preferences if present
+  if (obj.version === 2 && obj.accessibilityPreferences !== undefined) {
+    if (typeof obj.accessibilityPreferences !== 'object' || obj.accessibilityPreferences === null) {
+      return false;
+    }
+    const prefs = obj.accessibilityPreferences as Record<string, unknown>;
+    if (
+      typeof prefs.highContrast !== 'boolean' ||
+      (typeof prefs.fontSize !== 'string' || !['normal', 'large', 'extra-large'].includes(prefs.fontSize))
+    ) {
+      return false;
+    }
+  }
+  
   return true;
 }
 
-function loadGameState(): { gameState: GameState; board: BingoSquareData[]; winningLine: BingoLine | null } | null {
+function loadGameState(): { gameState: GameState; board: BingoSquareData[]; winningLine: BingoLine | null; accessibilityPreferences: AccessibilityPreferences } | null {
   // SSR guard
   if (typeof window === 'undefined') {
     return null;
@@ -98,10 +116,17 @@ function loadGameState(): { gameState: GameState; board: BingoSquareData[]; winn
     const parsed = JSON.parse(saved);
     
     if (validateStoredData(parsed)) {
+      // Migrate from v1 to v2 if needed
+      const accessibilityPreferences: AccessibilityPreferences = parsed.accessibilityPreferences || {
+        highContrast: false,
+        fontSize: 'normal' as const,
+      };
+      
       return {
         gameState: parsed.gameState,
         board: parsed.board,
         winningLine: parsed.winningLine,
+        accessibilityPreferences,
       };
     } else {
       console.warn('Invalid game state data in localStorage, clearing...');
@@ -117,7 +142,7 @@ function loadGameState(): { gameState: GameState; board: BingoSquareData[]; winn
   return null;
 }
 
-function saveGameState(gameState: GameState, board: BingoSquareData[], winningLine: BingoLine | null): void {
+function saveGameState(gameState: GameState, board: BingoSquareData[], winningLine: BingoLine | null, accessibilityPreferences: AccessibilityPreferences): void {
   // SSR guard
   if (typeof window === 'undefined') {
     return;
@@ -129,6 +154,7 @@ function saveGameState(gameState: GameState, board: BingoSquareData[], winningLi
       gameState,
       board,
       winningLine,
+      accessibilityPreferences,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (error) {
@@ -149,6 +175,9 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
     () => loadedState?.winningLine || null
   );
   const [showBingoModal, setShowBingoModal] = useState(false);
+  const [accessibilityPreferences, setAccessibilityPreferences] = useState<AccessibilityPreferences>(
+    () => loadedState?.accessibilityPreferences || { highContrast: false, fontSize: 'normal' }
+  );
 
   const winningSquareIds = useMemo(
     () => getWinningSquareIds(winningLine),
@@ -157,8 +186,8 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
 
   // Save game state to localStorage whenever it changes
   useEffect(() => {
-    saveGameState(gameState, board, winningLine);
-  }, [gameState, board, winningLine]);
+    saveGameState(gameState, board, winningLine, accessibilityPreferences);
+  }, [gameState, board, winningLine, accessibilityPreferences]);
 
   const startGame = useCallback(() => {
     setBoard(generateBoard());
@@ -196,14 +225,20 @@ export function useBingoGame(): BingoGameState & BingoGameActions {
     setShowBingoModal(false);
   }, []);
 
+  const updateAccessibilityPreferences = useCallback((preferences: Partial<AccessibilityPreferences>) => {
+    setAccessibilityPreferences((current) => ({ ...current, ...preferences }));
+  }, []);
+
   return {
     gameState,
     board,
     winningSquareIds,
     showBingoModal,
+    accessibilityPreferences,
     startGame,
     handleSquareClick,
     resetGame,
     dismissModal,
+    updateAccessibilityPreferences,
   };
 }
