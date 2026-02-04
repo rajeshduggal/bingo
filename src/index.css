@@ -1,10 +1,5 @@
 /* font imports removed during build debug - add back if needed */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Theme variables (used by components) */
 :root {

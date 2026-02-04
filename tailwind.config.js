@@ -1,9 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: {
-    files: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
-    safelist: ['bg-accent', 'bg-marked', 'border-marked-border', 'active:bg-accent-light']
-  },
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  safelist: ['bg-accent', 'bg-marked', 'border-marked-border', 'active:bg-accent-light'],
   theme: {
     extend: {
       colors: {
