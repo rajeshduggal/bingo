@@ -7,6 +7,7 @@ interface StartScreenProps {
 
 export function StartScreen({ onStart }: StartScreenProps) {
   const [mode, setMode] = useState<Mode>('classic');
+  const MODE_OPTIONS: Mode[] = ['classic', 'scavenger'];
 
   return (
     <div className="flex flex-col items-center justify-center min-h-full p-6">
@@ -25,28 +26,19 @@ export function StartScreen({ onStart }: StartScreenProps) {
         </div>
 
         <fieldset className="mb-4 flex justify-center gap-4" aria-label="Mode">
-          <label className="inline-flex items-center">
-            <input
-              type="radio"
-              name="mode"
-              value="classic"
-              checked={mode === 'classic'}
-              onChange={() => setMode('classic')}
-              className="mr-2"
-            />
-            Classic
-          </label>
-          <label className="inline-flex items-center">
-            <input
-              type="radio"
-              name="mode"
-              value="scavenger"
-              checked={mode === 'scavenger'}
-              onChange={() => setMode('scavenger')}
-              className="mr-2"
-            />
-            Scavenger
-          </label>
+          {MODE_OPTIONS.map((opt) => (
+            <label key={opt} className="inline-flex items-center">
+              <input
+                type="radio"
+                name="mode"
+                value={opt}
+                checked={mode === opt}
+                onChange={() => setMode(opt)}
+                className="mr-2"
+              />
+              {opt[0].toUpperCase() + opt.slice(1)}
+            </label>
+          ))}
         </fieldset>
 
         <button

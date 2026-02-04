@@ -23,12 +23,15 @@ export interface BingoGameActions {
 
 const STORAGE_KEY = 'bingo-game-state';
 const STORAGE_VERSION = 1;
+const isBrowser = typeof window !== 'undefined';
 
 interface StoredGameData {
   version: number;
   gameState: GameState;
   board: BingoSquareData[];
   winningLine: BingoLine | null;
+  // optional for future compatibility
+  mode?: Mode;
 }
 
 function validateStoredData(data: unknown): data is StoredGameData {
@@ -84,44 +87,34 @@ function validateStoredData(data: unknown): data is StoredGameData {
 }
 
 function loadGameState(): { gameState: GameState; board: BingoSquareData[]; winningLine: BingoLine | null } | null {
-  // SSR guard
-  if (typeof window === 'undefined') {
-    return null;
-  }
+  if (!isBrowser) return null;
 
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) {
-      return null;
-    }
+    if (!saved) return null;
 
     const parsed = JSON.parse(saved);
-    
+
     if (validateStoredData(parsed)) {
       return {
         gameState: parsed.gameState,
         board: parsed.board,
         winningLine: parsed.winningLine,
       };
-    } else {
-      console.warn('Invalid game state data in localStorage, clearing...');
-      localStorage.removeItem(STORAGE_KEY);
     }
+
+    console.warn('Invalid game state data in localStorage, clearing...');
+    localStorage.removeItem(STORAGE_KEY);
   } catch (error) {
     console.warn('Failed to load game state:', error);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem(STORAGE_KEY);
-    }
+    if (isBrowser) localStorage.removeItem(STORAGE_KEY);
   }
 
   return null;
 }
 
 function saveGameState(gameState: GameState, board: BingoSquareData[], winningLine: BingoLine | null): void {
-  // SSR guard
-  if (typeof window === 'undefined') {
-    return;
-  }
+  if (!isBrowser) return;
 
   try {
     const data: StoredGameData = {
