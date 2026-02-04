@@ -83,7 +83,7 @@ function validateStoredData(data: unknown): data is StoredGameData {
   return true;
 }
 
-function loadGameState(): Pick<BingoGameState, 'gameState' | 'board' | 'winningLine'> | null {
+function loadGameState(): { gameState: GameState; board: BingoSquareData[]; winningLine: BingoLine | null } | null {
   // SSR guard
   if (typeof window === 'undefined') {
     return null;
